@@ -38,7 +38,15 @@ function App() {
   // Инициализация Firebase и аутентификация
   useEffect(() => {
     try {
-      const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+     const firebaseConfig = {
+  apiKey: "AIzaSyADmbFY5ornKfgFuJ2pBpBsugbbIv3-i0Y",
+  authDomain: "my-location-app-7c46c.firebaseapp.com",
+  projectId: "my-location-app-7c46c",
+  storageBucket: "my-location-app-7c46c.firebasestorage.app",
+  messagingSenderId: "907501247122",
+  appId: "1:907501247122:web:d39d93f2dbf1e77741644b",
+  measurementId: "G-NLCTMGQLJH"
+};
       const app = initializeApp(firebaseConfig);
       const firestoreDb = getFirestore(app);
       const firebaseAuth = getAuth(app);
@@ -47,20 +55,15 @@ function App() {
       setAuth(firebaseAuth);
 
       const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
-        if (user) {
-          setUserId(user.uid);
-        } else {
-          // Если токен не предоставлен, входим анонимно
-          if (typeof __initial_auth_token !== 'undefined') {
-            await signInWithCustomToken(firebaseAuth, __initial_auth_token);
-          } else {
-            await signInAnonymously(firebaseAuth);
-          }
-          setUserId(firebaseAuth.currentUser?.uid || crypto.randomUUID()); // Fallback for userId
-        }
-        setIsAuthReady(true);
-      });
-
+  if (user) {
+    setUserId(user.uid);
+  } else {
+    // Входим анонимно
+    await signInAnonymously(firebaseAuth);
+    setUserId(firebaseAuth.currentUser?.uid || crypto.randomUUID());
+  }
+  setIsAuthReady(true);
+});
       return () => unsubscribe();
     } catch (error) {
       console.error("Ошибка инициализации Firebase:", error);
@@ -75,7 +78,7 @@ function App() {
       console.log("Firestore или userId не готовы, или пароль отсутствует.");
       return;
     }
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const appId = 'my-location-app-id'; 
     const docRef = doc(db, `artifacts/${appId}/public/data/sharedLocations`, password); // Используем пароль как ID документа
 
     try {
@@ -143,7 +146,7 @@ function App() {
 
     // Отметить документ как неактивный в Firestore
     if (db && sharingPassword) {
-      const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+      const appId = 'my-location-app-id';
       const docRef = doc(db, `artifacts/${appId}/public/data/sharedLocations`, sharingPassword);
       try {
         await setDoc(docRef, { active: false }, { merge: true });
@@ -168,7 +171,7 @@ function App() {
     setViewerMessage('Ищу местоположение...');
     setViewerGoogleMapsLink('');
 
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const appId = 'my-location-app-id';
     const docRef = doc(db, `artifacts/${appId}/public/data/sharedLocations`, viewerPassword);
 
     // Слушаем изменения в документе в реальном времени
